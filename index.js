@@ -1,46 +1,35 @@
-const yargs = require('yargs')
-const pkg = require('./package.json')
-const {addNote, printNotes, removeNote} = require('./notes.controller')
+// стандартный модуль http
+const http = require("http");
+const chalk = require("chalk");
 
-yargs.version(pkg.version)
+//модуль чтения файла
+const fs = require("fs/promises");
+const path = require("path");
 
-yargs.command({
-  command: 'add',
-  describe: 'Add new note to list',
-  builder: {
-    title: {
-      type: 'string',
-      describe: 'Note title',
-      demandOption: true
-    }
-  },
-  handler({ title }) {
-    addNote(title)
+//port
+const PORT = 3000;
+
+// чтение файла
+const basePath = path.join(__dirname, "pages");
+
+// создание сервера по стандарту http
+const server = http.createServer(async (req, res) => {
+  // обработка запроса GET
+  if (req.method === "GET") {
+    const content = await fs.readFile(path.join(basePath, "index.html"));
+    // res.setHeader("Content-Type", "text/html");
+    res.writeHead(200, {
+      "Content-Type": "text/html",
+    });
+    res.end(content);
   }
-})
-
-yargs.command({
-  command: 'list',
-  describe: 'Print all notes',
-  async handler() {
-    printNotes()
+  //обработка запроса POST
+  else if (req.method === "POST") {
+    res.end("post succsess");
   }
-})
+});
 
-
-yargs.command({
-  command: 'remove',
-  describe: 'Remove note by id',
-  builder: {
-    id: {
-      type: 'string',
-      describe: 'Note id',
-      demandOption: true
-    }
-  },
-  handler({ id }) {
-    removeNote(id)
-  }
-})
-
-yargs.parse()
+//запуск сервера на порту 3000
+server.listen(PORT, () => {
+  console.log(chalk.blue("Server started on port: ", PORT));
+});
