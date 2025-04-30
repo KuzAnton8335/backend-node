@@ -1,23 +1,25 @@
-// стандартный модуль http
-const http = require("http");
 // подключение библиотеки express
 const express = require("express");
 const chalk = require("chalk");
+const path = require("path");
 
 //модуль чтения файла
 const fs = require("fs/promises");
-const path = require("path");
 
 //добавления данных в файл базы данных
-const { addNote } = require("./notes.controller.js");
+const { addNote, getNotes, removeNote } = require("./notes.controller.js");
 
 //port
 const PORT = 3000;
 
-// чтение файла
-const basePath = path.join(__dirname, "pages");
 // инициализация приложения при помощи библиотеки express
 const app = express();
+// подключение ejs для шаблонизации
+app.set("view engine", "ejs");
+app.set("views", "pages");
+// подключение статических файлов
+app.use(express.static(path.resolve(__dirname, "public")));
+
 // настройка express для работы с данными
 app.use(
   express.urlencoded({
@@ -26,14 +28,33 @@ app.use(
 );
 
 // обработка get запросов
-app.get("/", (req, res) => {
-  res.sendFile(path.join(basePath, "index.html"));
+app.get("/", async (req, res) => {
+  res.render("index", {
+    title: "Express App",
+    notes: await getNotes(),
+    created: false,
+  });
 });
 
 //обработка post запросов
 app.post("/", async (req, res) => {
   await addNote(req.body.title);
-  res.sendFile(path.join(basePath, "index.html"));
+  res.render("index", {
+    title: "Express App",
+    notes: await getNotes(),
+    created: true,
+  });
+});
+
+// обработка запроса на удаление
+app.delete("/:id", async (req, res) => {
+  // console.log("req:", req.params.id);
+  await removeNote(req.params.id);
+  res.render("index", {
+    title: "Express App",
+    notes: await getNotes(),
+    created: false,
+  });
 });
 
 //запуск сервера на порту 3000
