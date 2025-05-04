@@ -31,10 +31,12 @@
 					<div class="card">
 						<ul class="list-group">
 							<% for (let i=0; i < notes.length; i++) { %>
-								<li class="list-group-item">
-									<%= notes[i].title %>
+								<li class="list-group-item" id="note-<%= notes.id %>">
+										<span class="note-title"><%= notes[i].title %></span>
 										<button class="btn btn-danger btn-sm float-end" data-type="remove"
 											data-id='<%= notes[i].id %>'>Delete</button>
+										<button class="btn btn-primary btn-sm float-end" style="margin-right: 5px;"
+										data-type="edit" data-id='<%= notes[i].id %>')">Редактировать</button>
 								</li>
 								<% } %>
 						</ul>
