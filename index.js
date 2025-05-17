@@ -2,6 +2,10 @@
 const express = require("express");
 const chalk = require("chalk");
 const path = require("path");
+// подключение библиотеки mongoose
+const mongoose = require("mongoose");
+// подлключение модели Note
+const Note = require("./models/Note");
 
 //модуль чтения файла
 const fs = require("fs/promises");
@@ -62,7 +66,7 @@ app.put('/notes/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { title } = req.body;
-    
+
     await editNote(id, title);
     res.status(200).json({ message: 'Note updated successfully' });
   } catch (error) {
@@ -70,7 +74,13 @@ app.put('/notes/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update note' });
   }
 });
-//запуск сервера на порту 3000
-app.listen(PORT, () => {
-  console.log(chalk.blue("Server started on port: ", PORT));
-});
+// подключение к базе данных mongodb
+mongoose.connect(
+  'mongodb://user:mongopass@localhost:27017/testdb?authSource=admin'
+).then( async() => {
+  await Note.create({title: "test"})
+  //запуск сервера на порту 3000
+  app.listen(PORT, () => {
+    console.log(chalk.blue("Server started on port: ", PORT));
+  });
+})
