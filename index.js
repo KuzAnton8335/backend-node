@@ -4,8 +4,7 @@ const chalk = require("chalk");
 const path = require("path");
 // подключение библиотеки mongoose
 const mongoose = require("mongoose");
-// подлключение модели Note
-const Note = require("./models/Note");
+
 
 //модуль чтения файла
 const fs = require("fs/promises");
@@ -38,17 +37,30 @@ app.get("/", async (req, res) => {
     title: "Express App",
     notes: await getNotes(),
     created: false,
+    edited: false,
   });
 });
 
 //обработка post запросов ( добавление заметки в файл)
 app.post("/", async (req, res) => {
-  await addNote(req.body.title);
-  res.render("index", {
-    title: "Express App",
-    notes: await getNotes(),
-    created: true,
-  });
+  try{
+    await addNote(req.body.title);
+    res.render("index", {
+      title: "Express App",
+      notes: await getNotes(),
+      created: true,
+      error: false,
+    });
+  } catch (error) {
+    console.error('Creation error', error);
+    res.render("index", {
+      title: "Express App",
+      notes: await getNotes(),
+      created: false,
+      error: true,
+    });
+  }
+ 
 });
 
 // обработка запроса на удаление
@@ -59,6 +71,7 @@ app.delete("/:id", async (req, res) => {
     title: "Express App",
     notes: await getNotes(),
     created: false,
+    error: false,
   });
 });
 // обработка запроса на редактирования заметки
@@ -77,8 +90,8 @@ app.put('/notes/:id', async (req, res) => {
 // подключение к базе данных mongodb
 mongoose.connect(
   'mongodb://user:mongopass@localhost:27017/testdb?authSource=admin'
-).then( async() => {
-  await Note.create({title: "test"})
+).then(() => {
+  
   //запуск сервера на порту 3000
   app.listen(PORT, () => {
     console.log(chalk.blue("Server started on port: ", PORT));
