@@ -60,7 +60,7 @@ app.post("/", async (req, res) => {
       error: true,
     });
   }
- 
+
 });
 
 // обработка запроса на удаление
@@ -91,7 +91,7 @@ app.put('/notes/:id', async (req, res) => {
 mongoose.connect(
   'mongodb://user:mongopass@localhost:27017/testdb?authSource=admin'
 ).then(() => {
-  
+
   //запуск сервера на порту 3000
   app.listen(PORT, () => {
     console.log(chalk.blue("Server started on port: ", PORT));
